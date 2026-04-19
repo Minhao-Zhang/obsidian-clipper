@@ -1,0 +1,68 @@
+# Publishes unofficial fork builds to this repo's Releases (not Obsidian's).
+# Official releases: https://github.com/obsidianmd/obsidian-clipper/releases
+name: Release (fork)
+
+on:
+  push:
+    tags:
+      # Same shape as upstream tags (e.g. 1.5.1), not v1.5.1 — see obsidianmd/obsidian-clipper releases
+      - '*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm test
+
+      - run: npm run build
+
+      - name: Stage zips with fork-specific names
+        run: |
+          mkdir -p release-assets
+          shopt -s nullglob
+          zips=(builds/obsidian-web-clipper-*.zip)
+          if [ ${#zips[@]} -eq 0 ]; then
+            echo "No zip files in builds/. Check production webpack ZipPlugin."
+            exit 1
+          fi
+          for z in "${zips[@]}"; do
+            base=$(basename "$z" .zip)
+            cp "$z" "release-assets/${base}-bilibili-fork.zip"
+          done
+          ls -la release-assets/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: 'bilibili-fork — ${{ github.ref_name }} (unofficial)'
+          body: |
+            **This release is from a community fork, not from Obsidian.**  
+            Repository: **https://github.com/${{ github.repository }}**
+
+            For the **official** Obsidian Web Clipper (browser stores, support, and official binaries), use **[obsidian.md/clipper](https://obsidian.md/clipper)** and **[obsidianmd/obsidian-clipper releases](https://github.com/obsidianmd/obsidian-clipper/releases)**.
+
+            ---
+
+            ### Fork differences
+            - Bilibili video pages: fetch transcript/subtitles into template variable `{{transcript}}` (see README and bundled template JSON).
+
+            ### Assets
+            Zip names end with **`bilibili-fork`** so they are not mistaken for official store builds. Sideload at your own risk; see this repo README.
+
+            _Built from tag `${{ github.ref_name }}` (`${{ github.sha }}`)._
+          files: release-assets/*
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
