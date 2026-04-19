@@ -10,6 +10,10 @@ import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
+import {
+	BILIBILI_TRANSCRIPT_MESSAGE_ACTION,
+	type FetchBilibiliTranscriptResponse,
+} from './utils/bilibili-transcript';
 
 declare global {
 	interface Window {
@@ -219,6 +223,23 @@ declare global {
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
+				let articleContent = defuddled.content;
+				try {
+					// Bilibili APIs must run from the background worker: content-script fetch
+					// is same-origin as the page and api.bilibili.com blocks that with CORS.
+					const biliRes = (await browser.runtime.sendMessage({
+						action: BILIBILI_TRANSCRIPT_MESSAGE_ACTION,
+						pageUrl: document.URL,
+					})) as FetchBilibiliTranscriptResponse;
+					if (biliRes.success && biliRes.payload) {
+						extractedContent.transcript = biliRes.payload.transcript;
+						articleContent = articleContent + biliRes.payload.transcriptHtml;
+					} else if (!biliRes.success) {
+						console.warn('[Obsidian Clipper] Bilibili transcript:', biliRes.error);
+					}
+				} catch (e) {
+					console.warn('[Obsidian Clipper] Bilibili transcript fetch failed:', e);
+				}
 
 				// Create a new DOMParser
 				const parser = new DOMParser();
@@ -264,7 +285,7 @@ declare global {
 
 				const response: ContentResponse = {
 					author: defuddled.author,
-					content: defuddled.content,
+					content: articleContent,
 					description: defuddled.description,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,

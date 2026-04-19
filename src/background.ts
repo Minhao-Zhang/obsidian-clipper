@@ -1,4 +1,8 @@
 import browser from 'webextension-polyfill';
+import {
+	tryFetchBilibiliTranscript,
+	BILIBILI_TRANSCRIPT_MESSAGE_ACTION,
+} from './utils/bilibili-transcript';
 import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage, isNormalPageUrl } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
@@ -363,6 +367,23 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "extractContent" && sender.tab && sender.tab.id) {
 			browser.tabs.sendMessage(sender.tab.id, request).then(sendResponse);
+			return true;
+		}
+
+		if (typedRequest.action === BILIBILI_TRANSCRIPT_MESSAGE_ACTION) {
+			const pageUrl = (typedRequest as { pageUrl?: string }).pageUrl;
+			if (!pageUrl) {
+				sendResponse({ success: false, error: 'Missing pageUrl' });
+				return true;
+			}
+			void tryFetchBilibiliTranscript(pageUrl)
+				.then((payload) => sendResponse({ success: true, payload: payload ?? null }))
+				.catch((err) =>
+					sendResponse({
+						success: false,
+						error: err instanceof Error ? err.message : String(err),
+					})
+				);
 			return true;
 		}
 

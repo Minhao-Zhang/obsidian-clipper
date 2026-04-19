@@ -48,13 +48,17 @@ export function wireTranscript(
 	scroll: ScrollHelper,
 	onSettingChange?: (key: keyof TranscriptSettings, value: boolean) => void
 ): void {
-	const transcript = article.querySelector('.youtube.transcript') as HTMLElement | null;
+	const transcript = article.querySelector('.youtube.transcript, .bilibili.transcript') as HTMLElement | null;
 	if (!transcript) return;
 
-	const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
+	const iframe = article.querySelector(
+		'iframe[src*="youtube.com/embed/"], iframe[src*="player.bilibili.com"]'
+	) as HTMLIFrameElement | null;
 	const videoWrapper = article.querySelector('.reader-video-wrapper') as HTMLElement | null;
 	const videoEl = videoWrapper?.querySelector('video.reader-video-player') as HTMLVideoElement | null;
-	const thumbnailLink = article.querySelector('a[href*="youtube.com/watch"]') as HTMLAnchorElement | null;
+	const thumbnailLink = article.querySelector(
+		'a[href*="youtube.com/watch"], a[href*="/video/BV"]'
+	) as HTMLAnchorElement | null;
 	const playerEl = (videoWrapper || iframe || thumbnailLink) as HTMLElement | null;
 	if (!playerEl) return;
 
@@ -144,7 +148,9 @@ export function wireTranscript(
 
 	playerContainer.appendChild(toggleBar);
 
-	if (iframe) {
+	const isYoutubeEmbed = iframe?.src.includes('youtube.com/embed/');
+
+	if (iframe && isYoutubeEmbed) {
 		// Enable JS API on the embed
 		const src = new URL(iframe.src);
 		src.searchParams.set('enablejsapi', '1');
@@ -398,8 +404,8 @@ export function wireTranscript(
 				e.preventDefault();
 			}
 		});
-	} else if (iframe) {
-		// Iframe embed: use postMessage API
+	} else if (iframe && isYoutubeEmbed) {
+		// Iframe embed: use YouTube IFrame postMessage API
 		seekTo = (seconds: number) => {
 			if (!iframe.contentWindow) return;
 			iframe.contentWindow.postMessage(JSON.stringify({
@@ -443,7 +449,7 @@ export function wireTranscript(
 	const togglePlayPause = () => {
 		if (videoEl) {
 			videoEl.paused ? videoEl.play() : videoEl.pause();
-		} else if (iframe?.contentWindow) {
+		} else if (iframe?.contentWindow && isYoutubeEmbed) {
 			iframe.contentWindow.postMessage(JSON.stringify({
 				event: 'command',
 				func: iframePlaying ? 'pauseVideo' : 'playVideo',
@@ -455,7 +461,7 @@ export function wireTranscript(
 	const seekRelative = (delta: number) => {
 		if (videoEl) {
 			videoEl.currentTime = Math.max(0, videoEl.currentTime + delta);
-		} else if (iframe?.contentWindow) {
+		} else if (iframe?.contentWindow && isYoutubeEmbed) {
 			seekTo(Math.max(0, lastCurrentTime + delta));
 		}
 	};
@@ -468,9 +474,9 @@ export function wireTranscript(
 
 		switch (e.code) {
 			case 'Space':
-				// Only handle Space for iframe embeds — native video
+				// Only handle Space for YouTube iframe embeds — native video
 				// controls handle Space themselves and would double-toggle
-				if (!videoEl) {
+				if (!videoEl && isYoutubeEmbed) {
 					e.preventDefault();
 					e.stopImmediatePropagation();
 					togglePlayPause();
@@ -478,36 +484,46 @@ export function wireTranscript(
 				break;
 			case 'KeyK':
 				// K is not a native video shortcut, so handle it for both
-				e.preventDefault();
-				e.stopImmediatePropagation();
-				togglePlayPause();
+				if (videoEl || isYoutubeEmbed) {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					togglePlayPause();
+				}
 				break;
 			case 'ArrowLeft':
-				e.preventDefault();
-				e.stopImmediatePropagation();
-				seekRelative(-5);
+				if (videoEl || isYoutubeEmbed) {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					seekRelative(-5);
+				}
 				break;
 			case 'ArrowRight':
-				e.preventDefault();
-				e.stopImmediatePropagation();
-				seekRelative(5);
+				if (videoEl || isYoutubeEmbed) {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					seekRelative(5);
+				}
 				break;
 			case 'KeyJ':
-				e.preventDefault();
-				e.stopImmediatePropagation();
-				seekRelative(-10);
+				if (videoEl || isYoutubeEmbed) {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					seekRelative(-10);
+				}
 				break;
 			case 'KeyL':
-				e.preventDefault();
-				e.stopImmediatePropagation();
-				seekRelative(10);
+				if (videoEl || isYoutubeEmbed) {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					seekRelative(10);
+				}
 				break;
 		}
 	}, { capture: true });
 
 	// YouTube handles Space on keyup — block that too
 	doc.addEventListener('keyup', (e: KeyboardEvent) => {
-		if (e.code === 'Space' && !videoEl) {
+		if (e.code === 'Space' && !videoEl && isYoutubeEmbed) {
 			const tag = (e.target as HTMLElement).tagName;
 			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 			e.preventDefault();

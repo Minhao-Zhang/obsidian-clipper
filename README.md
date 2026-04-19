@@ -1,3 +1,41 @@
+> **【中文说明】**  
+> 本仓库是 [Obsidian 官方网页剪藏（obsidian-clipper）](https://github.com/obsidianmd/obsidian-clipper) 的 **fork**，在官方功能之外 **仅增加**：在哔哩哔哩（Bilibili）视频页剪藏时，通过扩展从 B 站接口拉取 **字幕/口播文稿**，并写入剪藏笔记中的 **「字幕」** 区块（模板变量 `{{transcript}}`）。请在 Obsidian Web Clipper 设置中 **导入模板**：[哔哩哔哩视频字幕剪藏模板.json](./哔哩哔哩视频字幕剪藏模板.json)（仓库根目录；在 GitHub 网页上可点开链接后使用右上角 **Raw** 下载再导入）。其余行为与上游一致；使用与排错请以官方文档为准。
+
+## 本地构建并加载扩展（中文）
+
+以下步骤在 **Windows、macOS、Linux** 上相同；只需在本机安装 [Node.js](https://nodejs.org/)（建议 LTS），并在**仓库根目录**打开终端执行命令即可。各系统打开终端的方式示例：**Windows**（PowerShell 或「终端」）、**macOS**（「终端」或 iTerm）、**Linux**（发行版自带终端）。
+
+1. `npm install` — 安装依赖。  
+2. `npm run build:chrome` — 生成 Chromium 系浏览器共用的 **`dist/`** 目录（内含 `manifest.json` 等）。若需一并构建 Firefox / Safari，可用 `npm run build`（会额外得到 `dist_firefox/`、`dist_safari/`）。  
+3. 修改源码后重新执行第 2 步，再在浏览器扩展页对该扩展点 **「重新加载」**。
+
+### 重点：Google Chrome（Windows 与 macOS）
+
+1. 地址栏打开 **`chrome://extensions`**。  
+2. 打开右上角 **「开发者模式」**。  
+3. 点击 **「加载已解压的扩展程序」**，选中本仓库的 **`dist`** 文件夹（**不要**选 `builds` 里的 zip）。  
+   - **Windows** 路径示例：`C:\Users\你的用户名\…\obsidian-clipper\dist`  
+   - **macOS** 路径示例：`/Users/你的用户名/…/obsidian-clipper/dist`  
+4. 以后每次重新构建后，在同一页面点击该扩展的 **「重新加载」**。
+
+### Linux 上的 Google Chrome
+
+与上相同：使用 **`chrome://extensions`** + **`dist/`**；路径形如 `/home/你的用户名/…/obsidian-clipper/dist`。
+
+### 其他 Chromium 系浏览器（Edge、Brave、Arc、Opera 等）
+
+同样加载 **`dist/`** 未打包目录；仅「扩展管理」入口不同，例如 Microsoft Edge 为 **`edge://extensions`**，Brave 多为 **`brave://extensions`**，界面与 Chrome 类似（开发者模式 + 加载已解压）。
+
+### Firefox
+
+执行 **`npm run build:firefox`**，在 `about:debugging#/runtime/this-firefox` 中 **「临时载入扩展」**，选择 **`dist_firefox/manifest.json`**。长期安装方式见下文英文 **Developers** 小节。
+
+### Safari（macOS / iOS）
+
+执行 **`npm run build:safari`** 后需配合 Xcode 工程安装，步骤见下文英文 **Developers** 中 *iOS Simulator* 相关说明。
+
+---
+
 Obsidian Web Clipper helps you highlight and capture the web in your favorite browser. Anything you save is stored as durable Markdown files that you can read offline, and preserve for the long term.
 
 - **[Download Web Clipper](https://obsidian.md/clipper)**
