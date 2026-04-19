@@ -19,9 +19,19 @@ export function escapeDoubleQuotes(str: string): string {
 }
 
 export function sanitizeFileName(fileName: string): string {
-	const platform = (navigator as any).userAgentData?.platform || navigator.platform || '';
-	const isWindows = /win/i.test(platform);
-	const isMac = /mac/i.test(platform);
+	let isWindows: boolean;
+	let isMac: boolean;
+	if (typeof navigator !== 'undefined' && navigator) {
+		const platform = (navigator as any).userAgentData?.platform || navigator.platform || '';
+		isWindows = /win/i.test(platform);
+		isMac = /mac/i.test(platform);
+	} else if (typeof process !== 'undefined' && process.platform) {
+		isWindows = process.platform === 'win32';
+		isMac = process.platform === 'darwin';
+	} else {
+		isWindows = false;
+		isMac = false;
+	}
 
 	// First remove Obsidian-specific characters that should be sanitized across all platforms
 	let sanitized = fileName.replace(/[#|\^\[\]]/g, '');

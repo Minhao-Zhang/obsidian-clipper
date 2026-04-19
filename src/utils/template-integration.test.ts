@@ -108,6 +108,10 @@ function loadExpected(name: string): string | null {
 	return existsSync(expectedPath) ? readFileSync(expectedPath, 'utf-8') : null;
 }
 
+function normalizeEOL(s: string): string {
+	return s.replace(/\r\n/g, '\n');
+}
+
 function saveExpected(name: string, content: string): void {
 	if (!existsSync(EXPECTED_DIR)) {
 		mkdirSync(EXPECTED_DIR, { recursive: true });
@@ -150,6 +154,6 @@ describe('Template fixtures', () => {
 			);
 		}
 
-		expect(result.trim()).toEqual(expected.trim());
+		expect(normalizeEOL(result.trim())).toEqual(normalizeEOL(expected.trim()));
 	});
 });
