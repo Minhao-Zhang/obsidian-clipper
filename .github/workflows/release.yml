@@ -55,38 +55,18 @@ jobs:
         with:
           name: 'bilibili-fork — ${{ github.ref_name }}（非官方）'
           body: |
-            **本 Release 来自社区 fork，并非 Obsidian 官方发布。**
-
-            - **本仓库：** https://github.com/${{ github.repository }}
-            - **官方网页剪藏**（浏览器商店、支持与正式安装包）：[obsidian.md/clipper](https://obsidian.md/clipper) · [obsidianmd/obsidian-clipper Releases](https://github.com/obsidianmd/obsidian-clipper/releases)
-
-            ---
-
             ### 与官方版的区别
 
-            - 在 **哔哩哔哩** 视频页剪藏时，可从 B 站接口读取字幕/口播稿，写入模板变量 `{{transcript}}`。请先在 Obsidian Web Clipper 设置中 **导入模板**（仓库根目录的 `哔哩哔哩视频字幕剪藏模板.json`；在 GitHub 上打开该文件后可用右上角 **Raw** 下载再导入）。
-
-            ### 附件说明
-
-            - 共 **3** 个与官方结构一致的扩展包：**Chrome**、**Firefox**、**Safari**（均为 zip）。
-            - 文件名为 **`obsidian-web-clipper-bilibili-<浏览器>.zip`**（`chrome` / `firefox` / `safari`），与官方 `obsidian-web-clipper-<版本>-<浏览器>.zip` 命名区分；**侧载使用风险自负**。
-            - GitHub 会为该 tag 自动生成「Source code」源码压缩包。
+            - 在 **哔哩哔哩** 视频页剪藏时，可从 B 站接口读取字幕/口播稿，写入模板变量 `{{transcript}}`。请先在 Obsidian Web Clipper 设置中 **导入模板**（本仓库根目录的 `哔哩哔哩视频字幕剪藏模板.json`；在 GitHub 打开该文件后，点右上角 **Raw** 下载再导入）。
 
             ### 安装说明（侧载）
 
-            1. **下载** 对应 zip，例如 **`obsidian-web-clipper-bilibili-chrome.zip`**；Firefox、Safari 分别为 **`obsidian-web-clipper-bilibili-firefox.zip`**、**`obsidian-web-clipper-bilibili-safari.zip`**。
-            2. **Chromium 系**（Chrome、Edge、Brave 等）  
-               将 zip **解压**到任意文件夹。在地址栏打开 `chrome://extensions`（Edge 一般为 `edge://extensions`，Brave 多为 `brave://extensions`），打开右上角 **「开发者模式」** → **「加载已解压的扩展程序」** → 选择解压后的**文件夹**（不要直接把 zip 当文件夹加载）。
-            3. **Firefox**  
-               解压后打开 `about:debugging#/runtime/this-firefox` → **「临时载入附加组件」** → 选中解压目录里的 **`manifest.json`**。若需长期使用未签名扩展，请参阅本仓库 README 英文 **Developers** 小节或 Mozilla 文档。
-            4. **Safari**  
-               通常需配合 Xcode 工程安装与调试，请参阅本仓库 README 英文 **Developers** 中与 Safari / iOS Simulator 相关的说明。
+            1. 在本页 **Assets** 下载与你的浏览器对应的 zip：`obsidian-web-clipper-bilibili-chrome.zip`、`obsidian-web-clipper-bilibili-firefox.zip` 或 `obsidian-web-clipper-bilibili-safari.zip`。  
+            2. **Chromium 系**（Chrome、Edge、Brave 等）：解压 zip，打开 `chrome://extensions`（Edge 为 `edge://extensions`，Brave 多为 `brave://extensions`），开启 **开发者模式** → **加载已解压的扩展程序** → 选择解压后的文件夹（勿直接加载 zip）。  
+            3. **Firefox**：解压后打开 `about:debugging#/runtime/this-firefox` → **临时载入附加组件** → 选择解压目录里的 `manifest.json`。  
+            4. **Safari**：解压后按系统与 Apple 对 Safari 网页扩展的常见方式完成安装；需要官方支持请使用 [obsidian.md/clipper](https://obsidian.md/clipper)。  
 
-            本地从源码构建、重新加载扩展等步骤见本仓库 **README**（中文说明在文首）。使用与排错亦可参考 [官方 Web Clipper 文档](https://help.obsidian.md/web-clipper)。
-
-            ---
-
-            _构建自 tag `${{ github.ref_name }}`，提交 `${{ github.sha }}`。_
+            侧载有风险；商店正式版与官方说明见 [obsidian.md/clipper](https://obsidian.md/clipper)。
           files: release-assets/*
           fail_on_unmatched_files: true
         env:

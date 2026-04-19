@@ -1,27 +1,23 @@
 > **【中文说明】**  
 > 本仓库 fork 自 [Obsidian 官方网页剪藏（obsidian-clipper）](https://github.com/obsidianmd/obsidian-clipper)。在官方版基础上**只多了一项**：在哔哩哔哩视频页剪藏时，扩展会从 B 站接口取回**字幕/口播稿**，写进剪藏笔记里的「**字幕**」区块（模板里用 `{{transcript}}`）。  
-> 使用前请到 Obsidian Web Clipper 设置里**导入这份模板**：[哔哩哔哩视频字幕剪藏模板.json](./哔哩哔哩视频字幕剪藏模板.json)（文件在仓库根目录；若在 GitHub 网页上打开，可先点进文件，再点右上角 **Raw** 下载后导入）。  
-> 其他用法与官方仓库一致；具体怎么用、出问题怎么查，请以官方文档为准。
+> 使用前请到 Obsidian Web Clipper 设置里**导入这份模板**：[哔哩哔哩视频字幕剪藏模板.json](./哔哩哔哩视频字幕剪藏模板.json)（文件在仓库根目录；若在 GitHub 网页上打开，可先点进文件，再点右上角 **Raw** 下载再导入）。  
+> 其他用法与官方仓库一致；具体怎么用、出问题怎么查，请以 [官方 Web Clipper 文档](https://help.obsidian.md/web-clipper) 为准。
 
-## 本地构建并安装扩展
+## 下载与安装
 
-在仓库根目录：
+1. 打开本仓库 **[Releases](https://github.com/Minhao-Zhang/obsidian-clipper-bilibili/releases)**，在最新版本 **Assets** 中下载与你浏览器对应的 zip：  
+   - **Chrome / Edge / Brave 等 Chromium 系**：`obsidian-web-clipper-bilibili-chrome.zip`  
+   - **Firefox**：`obsidian-web-clipper-bilibili-firefox.zip`  
+   - **Safari**：`obsidian-web-clipper-bilibili-safari.zip`  
+2. **Chromium 系**：将 zip **解压**到任意文件夹 → 地址栏打开 `chrome://extensions`（Edge 一般为 `edge://extensions`，Brave 多为 `brave://extensions`）→ 打开右上角 **「开发者模式」** → **「加载已解压的扩展程序」** → 选中解压后的**文件夹**（勿直接把 zip 当文件夹加载）。  
+3. **Firefox**：解压后打开 `about:debugging#/runtime/this-firefox` → **「临时载入附加组件」** → 选中解压目录里的 **`manifest.json`**。  
+4. **Safari**：解压后请按 Apple 与 Obsidian 对 Safari 网页扩展的常见方式安装；更稳妥可使用 [官方商店版](https://obsidian.md/clipper)。  
 
-1. `npm install`  
-2. `npm run build:chrome` → **`dist/`**（Chromium 系）。要 Firefox / Safari 用 `npm run build`，或 `npm run build:firefox` / `npm run build:safari`。  
-3. 改代码后重新构建，在扩展管理页对本扩展 **重新加载**。
+侧载**未经**浏览器商店审核，请自担风险；需要官方支持与商店安装请使用 **[obsidian.md/clipper](https://obsidian.md/clipper)**。
 
-### Chromium（Chrome、Edge、Brave 等）
+## 本地开发
 
-在扩展页（如 `chrome://extensions`、`edge://extensions`、`brave://extensions`）打开开发者模式，**加载已解压**，选本仓库的 **`dist`**（勿选 `builds` 里的 zip）。
-
-### Firefox
-
-`npm run build:firefox` 后，在 `about:debugging#/runtime/this-firefox` **临时载入** `dist_firefox/manifest.json`。长期安装见下文 **Developers**。
-
-### Safari
-
-`npm run build:safari` 后需用 Xcode；见下文 **Developers** 中 *iOS Simulator* 相关说明。
+若要在本机克隆仓库、改代码、`npm run build` 与各浏览器 `dist` 目录等，请阅读 **[Developers（英文）](https://github.com/Minhao-Zhang/obsidian-clipper-bilibili/blob/main/README.md#developers)** 一节（可与同页 **Get started** 中的商店链接对照）；中文部分不再重复构建步骤。
 
 ---
 

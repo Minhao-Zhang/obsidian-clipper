@@ -12,13 +12,44 @@ declare const window: KagiWindow | undefined;
 
 export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-mobile' | 'brave' | 'edge' | 'safari' | 'mobile-safari' | 'ipad-os' | 'orion' | 'other'> {
 	try {
-		// Check if we're in a background script context
+		// MV3 service workers have no `window`. Do **not** use `typeof browser` first — in Chromium,
+		// webextension-polyfill still defines `browser`, so that heuristic wrongly returned "firefox"
+		// and skipped Chrome-only tab listeners (see background setupTabListeners).
 		if (typeof window === 'undefined' || !window) {
+			const ua = (typeof self !== 'undefined' && self.navigator?.userAgent || '').toLowerCase();
+			if (ua.includes('firefox')) {
+				return ua.includes('mobile') ? 'firefox-mobile' : 'firefox';
+			}
+			if (ua.indexOf('edg/') > -1) {
+				return 'edge';
+			}
+			if (ua.indexOf('chrome') > -1) {
+				const nav = (typeof self !== 'undefined' ? self.navigator : undefined) as NavigatorExtended | undefined;
+				if (nav?.brave) {
+					try {
+						if (await nav.brave.isBrave()) {
+							return 'brave';
+						}
+					} catch {
+						/* ignore */
+					}
+				}
+				return 'chrome';
+			}
+			if (ua.includes('safari')) {
+				if (ua.includes('ipad')) {
+					return 'ipad-os';
+				}
+				if (ua.includes('mobile') || ua.includes('iphone')) {
+					return 'mobile-safari';
+				}
+				return 'safari';
+			}
+			if (typeof chrome !== 'undefined' && chrome.runtime?.id) {
+				return 'chrome';
+			}
 			if (typeof browser !== 'undefined') {
 				return 'firefox';
-			}
-			if (typeof chrome !== 'undefined') {
-				return 'chrome';
 			}
 			return 'other';
 		}
