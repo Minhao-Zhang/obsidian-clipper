@@ -16,6 +16,7 @@ import {
 	BILIBILI_TRANSCRIPT_MESSAGE_ACTION,
 	type FetchBilibiliTranscriptResponse,
 } from './utils/bilibili-transcript';
+import { extractXiaohongshu } from './utils/xiaohongshu';
 
 declare global {
 	interface Window {
@@ -227,6 +228,12 @@ declare global {
 					...defuddled.variables,
 				};
 				let articleContent = defuddled.content;
+				let title = defuddled.title;
+				let author = defuddled.author;
+				let description = defuddled.description;
+				let image = defuddled.image;
+				let published = defuddled.published;
+				let site = defuddled.site;
 				try {
 					// Bilibili APIs must run from the background worker: content-script fetch
 					// is same-origin as the page and api.bilibili.com blocks that with CORS.
@@ -242,6 +249,17 @@ declare global {
 					}
 				} catch (e) {
 					console.warn('[Obsidian Clipper] Bilibili transcript fetch failed:', e);
+				}
+				const xhs = extractXiaohongshu(document);
+				if (xhs) {
+					Object.assign(extractedContent, xhs.variables);
+					articleContent = xhs.contentHtml;
+					title = xhs.title || title;
+					author = xhs.author || author;
+					description = xhs.description || description;
+					image = xhs.image || image;
+					published = xhs.published || published;
+					site = site || '小红书';
 				}
 
 				// Create a new DOMParser
@@ -287,29 +305,29 @@ declare global {
 				const cleanedHtml = doc.documentElement.outerHTML;
 
 				const response: ContentResponse = {
-					author: defuddled.author,
+					author,
 					content: articleContent,
-					description: defuddled.description,
+					description,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,
 					favicon: defuddled.favicon,
 					fullHtml: cleanedHtml,
 					highlights: highlighter.getHighlights(),
-					image: defuddled.image,
+					image,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,
-					published: defuddled.published,
+					published,
 					schemaOrgData: defuddled.schemaOrgData,
 					selectedHtml: selectedHtml,
-					site: defuddled.site,
-					title: defuddled.title,
+					site,
+					title,
 					wordCount: defuddled.wordCount,
 					metaTags: defuddled.metaTags || []
 				};
-				if (defuddled.title) {
-					highlighter.setPageTitle(defuddled.title);
+				if (title) {
+					highlighter.setPageTitle(title);
 				}
-				highlighter.updatePageDomainSettings({ site: defuddled.site, favicon: defuddled.favicon });
+				highlighter.updatePageDomainSettings({ site, favicon: defuddled.favicon });
 				sendResponse(response);
 			}).catch((error: unknown) => {
 				console.error('[Obsidian Clipper] getPageContent error:', error);

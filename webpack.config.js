@@ -174,7 +174,7 @@ module.exports = (env, argv) => {
 			...(isProduction ? [
 				new ZipPlugin({
 					path: path.resolve(__dirname, 'builds'),
-					filename: `obsidian-web-clipper-bilibili-${browserName}.zip`,
+					filename: `obsidian-web-clipper-fork-${browserName}.zip`,
 				})
 			] : [])
 		]

@@ -1,14 +1,14 @@
 > **【中文说明】**  
-> 本仓库 fork 自 [Obsidian 官方网页剪藏（obsidian-clipper）](https://github.com/obsidianmd/obsidian-clipper)。在官方版基础上**只多了一项**：在哔哩哔哩视频页剪藏时，扩展会从 B 站接口取回**字幕/口播稿**，写进剪藏笔记里的「**字幕**」区块（模板里用 `{{transcript}}`）。  
-> 使用前请到 Obsidian Web Clipper 设置里**导入这份模板**：[哔哩哔哩视频字幕剪藏模板.json](./哔哩哔哩视频字幕剪藏模板.json)（文件在仓库根目录；若在 GitHub 网页上打开，可先点进文件，再点右上角 **Raw** 下载再导入）。  
-> 其他用法与官方仓库一致；具体怎么用、出问题怎么查，请以 [官方 Web Clipper 文档](https://help.obsidian.md/web-clipper) 为准。
+> 本仓库是 [Obsidian 官方网页剪藏（obsidian-clipper）](https://github.com/obsidianmd/obsidian-clipper) 的个人 fork，用于保留一些适合个人工作流的改动。与官方版的具体差异请以本仓库代码和提交记录为准。  
+> 如果你只需要官方稳定版，请优先使用 [官方安装页](https://obsidian.md/clipper)、[Chrome Web Store](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf) 或 [官方 GitHub 仓库](https://github.com/obsidianmd/obsidian-clipper)。  
+> 本 fork 可能包含额外站点支持和示例模板，例如 [哔哩哔哩视频字幕剪藏模板.json](./哔哩哔哩视频字幕剪藏模板.json) 与 [小红书笔记剪藏模板.json](./小红书笔记剪藏模板.json)。导入模板时，可在 GitHub 打开对应文件后点击 **Raw** 下载再导入。
 
 ## 下载与安装
 
-1. 打开本仓库 **[Releases](https://github.com/Minhao-Zhang/obsidian-clipper-bilibili/releases)**，在最新版本 **Assets** 中下载与你浏览器对应的 zip：  
-   - **Chrome / Edge / Brave 等 Chromium 系**：`obsidian-web-clipper-bilibili-chrome.zip`  
-   - **Firefox**：`obsidian-web-clipper-bilibili-firefox.zip`  
-   - **Safari**：`obsidian-web-clipper-bilibili-safari.zip`  
+1. 打开本仓库 **[Releases](https://github.com/Minhao-Zhang/obsidian-clipper/releases)**，在最新版本 **Assets** 中下载与你浏览器对应的 zip：  
+   - **Chrome / Edge / Brave 等 Chromium 系**：`obsidian-web-clipper-fork-chrome.zip`  
+   - **Firefox**：`obsidian-web-clipper-fork-firefox.zip`  
+   - **Safari**：`obsidian-web-clipper-fork-safari.zip`  
 2. **Chromium 系**：将 zip **解压**到任意文件夹 → 地址栏打开 `chrome://extensions`（Edge 一般为 `edge://extensions`，Brave 多为 `brave://extensions`）→ 打开右上角 **「开发者模式」** → **「加载已解压的扩展程序」** → 选中解压后的**文件夹**（勿直接把 zip 当文件夹加载）。  
 3. **Firefox**：解压后打开 `about:debugging#/runtime/this-firefox` → **「临时载入附加组件」** → 选中解压目录里的 **`manifest.json`**。  
 4. **Safari**：解压后请按 Apple 与 Obsidian 对 Safari 网页扩展的常见方式安装；更稳妥可使用 [官方商店版](https://obsidian.md/clipper)。  
@@ -17,7 +17,7 @@
 
 ## 本地开发
 
-若要在本机克隆仓库、改代码、`npm run build` 与各浏览器 `dist` 目录等，请阅读 **[Developers（英文）](https://github.com/Minhao-Zhang/obsidian-clipper-bilibili/blob/main/README.md#developers)** 一节（可与同页 **Get started** 中的商店链接对照）；中文部分不再重复构建步骤。
+若要在本机克隆仓库、改代码、`npm run build` 与各浏览器 `dist` 目录等，请阅读 **[Developers（英文）](https://github.com/Minhao-Zhang/obsidian-clipper/blob/main/README.md#developers)** 一节（可与同页 **Get started** 中的官方商店链接对照）；中文部分不再重复构建步骤。
 
 ---
 

@@ -1,0 +1,23 @@
+{
+	"schemaVersion": "0.1.0",
+	"name": "小红书笔记剪藏",
+	"behavior": "create",
+	"noteNameFormat": "{{date|date:\"YYYY-MM-DD\"}} {{xhsTitle|safe_name}}",
+	"path": "Clippings/Xiaohongshu",
+	"noteContentFormat": "## {{xhsTitle}}\n\n> Author: {{xhsAuthor}} | Saved: {{date|date:\"YYYY-MM-DD\"}} | [Open on Xiaohongshu]({{url}})\n> Likes: {{xhsLikes}} | Collects: {{xhsCollects}} | Comments: {{xhsComments}}\n\n---\n\n{{xhsContent}}\n\n{{xhsTags}}\n\n{{xhsImageMarkdown}}\n\nVideo: {{xhsVideo}}\n\n---\n\n## Notes\n\n{{selection}}\n\n{{highlights}}",
+	"properties": [
+		{ "name": "title", "value": "{{xhsTitle}}", "type": "text" },
+		{ "name": "source", "value": "{{url}}", "type": "text" },
+		{ "name": "author", "value": "{{xhsAuthor}}", "type": "text" },
+		{ "name": "published", "value": "{{xhsPublished}}", "type": "date" },
+		{ "name": "saved", "value": "{{date}}", "type": "date" },
+		{ "name": "type", "value": "{{xhsNoteType}}", "type": "text" },
+		{ "name": "tags", "value": "xiaohongshu, 小红书", "type": "multitext" }
+	],
+	"triggers": [
+		"https://www.xiaohongshu.com/explore/",
+		"https://www.xiaohongshu.com/discovery/item/",
+		"https://www.xiaohongshu.com/search_result/",
+		"/https?:\\/\\/[^/?]*xiaohongshu\\.com\\/(explore|discovery\\/item|search_result)\\//"
+	]
+}

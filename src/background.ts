@@ -251,7 +251,12 @@ async function initialize() {
 		await enableYouTubeInnertubeRule();
 
 		// Set up action popup based on openBehavior setting
-		await updateActionPopup();
+		await updateActionPopup().catch((error) => {
+			// Chrome can transiently report "No SW" while restoring an MV3
+			// service worker. Keep the background alive; the manifest popup
+			// remains usable and settings changes will retry this path.
+			console.warn('Unable to update action popup:', error);
+		});
 
 		debugLog('Clipper', 'Background script initialized successfully');
 	} catch (error) {

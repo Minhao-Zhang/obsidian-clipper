@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir -p release-assets
           shopt -s nullglob
-          zips=(builds/obsidian-web-clipper-bilibili-*.zip)
+          zips=(builds/obsidian-web-clipper-fork-*.zip)
           if [ ${#zips[@]} -ne 3 ]; then
             echo "Expected exactly 3 browser zips (chrome, firefox, safari); found ${#zips[@]}"
             ls -la builds/ || true
@@ -53,15 +53,17 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: 'bilibili-fork — ${{ github.ref_name }}（非官方）'
+          name: 'Obsidian Web Clipper fork — ${{ github.ref_name }}'
           body: |
-            ### 与官方版的区别
+            ### About this release
 
-            - 在 **哔哩哔哩** 视频页剪藏时，可从 B 站接口读取字幕/口播稿，写入模板变量 `{{transcript}}`。请先在 Obsidian Web Clipper 设置中 **导入模板**（本仓库根目录的 `哔哩哔哩视频字幕剪藏模板.json`；在 GitHub 打开该文件后，点右上角 **Raw** 下载再导入）。
+            This is an unofficial fork of [Obsidian Web Clipper](https://github.com/obsidianmd/obsidian-clipper) with personal workflow changes. Please compare this repository's code and commit history with upstream for the exact differences.
+
+            If you want the official, store-distributed extension, use [obsidian.md/clipper](https://obsidian.md/clipper) or the [Chrome Web Store listing](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf).
 
             ### 安装说明（侧载）
 
-            1. 在本页 **Assets** 下载与你的浏览器对应的 zip：`obsidian-web-clipper-bilibili-chrome.zip`、`obsidian-web-clipper-bilibili-firefox.zip` 或 `obsidian-web-clipper-bilibili-safari.zip`。  
+            1. 在本页 **Assets** 下载与你的浏览器对应的 zip：`obsidian-web-clipper-fork-chrome.zip`、`obsidian-web-clipper-fork-firefox.zip` 或 `obsidian-web-clipper-fork-safari.zip`。  
             2. **Chromium 系**（Chrome、Edge、Brave 等）：解压 zip，打开 `chrome://extensions`（Edge 为 `edge://extensions`，Brave 多为 `brave://extensions`），开启 **开发者模式** → **加载已解压的扩展程序** → 选择解压后的文件夹（勿直接加载 zip）。  
             3. **Firefox**：解压后打开 `about:debugging#/runtime/this-firefox` → **临时载入附加组件** → 选择解压目录里的 `manifest.json`。  
             4. **Safari**：解压后按系统与 Apple 对 Safari 网页扩展的常见方式完成安装；需要官方支持请使用 [obsidian.md/clipper](https://obsidian.md/clipper)。  
