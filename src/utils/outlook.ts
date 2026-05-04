@@ -9,8 +9,21 @@ export interface OutlookExtraction {
 	received: string;
 	bodyText: string;
 	bodyHtml: string;
+	threadText: string;
+	threadHtml: string;
+	messages: OutlookMessage[];
 	contentHtml: string;
 	variables: Record<string, string>;
+}
+
+export interface OutlookMessage {
+	from: string;
+	fromEmail: string;
+	to: string;
+	cc: string;
+	received: string;
+	bodyText: string;
+	bodyHtml: string;
 }
 
 const OUTLOOK_HOST_RE = /(^|\.)outlook\.(live|office|office365)\.com$|^outlook\.cloud\.microsoft$|(^|\.)office\.com$|(^|\.)office365\.com$|(^|\.)mail\.office365\.com$/i;
@@ -80,6 +93,12 @@ function findBodyElement(root: ParentNode): Element | null {
 	return candidates[0]?.el || null;
 }
 
+function findMessageElements(root: ParentNode): Element[] {
+	const messages = Array.from(root.querySelectorAll('[aria-label="Email message"]'))
+		.filter(el => !isHidden(el));
+	return messages.length > 0 ? messages : [];
+}
+
 function sanitizeBodyHtml(body: Element): string {
 	const clone = body.cloneNode(true) as Element;
 	clone.querySelectorAll('script, style, svg, button, input, textarea, select').forEach(el => el.remove());
@@ -92,6 +111,14 @@ function extractEmail(raw: string): string {
 	const decoded = raw.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 	const match = decoded.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
 	return match?.[0] || '';
+}
+
+function displayName(raw: string): string {
+	return cleanText(raw.replace(/&lt;[^&]*&gt;/g, '').replace(/<[^>]*>/g, ''));
+}
+
+function byIdSuffix(root: ParentNode, suffix: string): string {
+	return textFrom(root, [`[id$="${suffix}"]`]);
 }
 
 function fieldValue(root: ParentNode, label: string): string {
@@ -114,6 +141,63 @@ function fieldValue(root: ParentNode, label: string): string {
 	return '';
 }
 
+function extractMessage(root: ParentNode): OutlookMessage | null {
+	const body = findBodyElement(root);
+	if (!body) return null;
+
+	const from = displayName(fieldValue(root, 'From') || byIdSuffix(root, '_FROM'));
+	const to = fieldValue(root, 'To') || byIdSuffix(root, '_TO');
+	const cc = fieldValue(root, 'Cc') || byIdSuffix(root, '_CC');
+	const received = attrFrom(root, ['time', '[id$="_DATETIME"]'], 'datetime')
+		|| byIdSuffix(root, '_DATETIME')
+		|| fieldValue(root, 'Sent')
+		|| fieldValue(root, 'Date');
+	const bodyHtml = sanitizeBodyHtml(body);
+	const bodyText = cleanText(body.textContent || '');
+	const fromEmail = extractEmail(
+		attrFrom(root, ['[aria-label^="From:"]', '[title^="From:"]'], 'aria-label')
+		|| attrFrom(root, ['[aria-label^="From:"]', '[title^="From:"]'], 'title')
+		|| from
+	);
+
+	if (!from && !to && !received && !bodyText) return null;
+
+	return {
+		from,
+		fromEmail,
+		to,
+		cc,
+		received,
+		bodyText,
+		bodyHtml,
+	};
+}
+
+function buildMessageHtml(message: OutlookMessage, index: number): string {
+	const heading = message.from || message.received
+		? `${message.from || 'Message'}${message.received ? ` - ${message.received}` : ''}`
+		: `Message ${index + 1}`;
+	const parts = [`<section class="outlook-email-message">`, `<h2>${escapeHtml(heading)}</h2>`];
+	if (message.fromEmail) parts.push(`<p><strong>From email:</strong> ${escapeHtml(message.fromEmail)}</p>`);
+	if (message.to) parts.push(`<p><strong>To:</strong> ${escapeHtml(message.to)}</p>`);
+	if (message.cc) parts.push(`<p><strong>Cc:</strong> ${escapeHtml(message.cc)}</p>`);
+	if (message.bodyHtml) parts.push(message.bodyHtml);
+	parts.push('</section>');
+	return parts.join('\n');
+}
+
+function buildThreadText(messages: OutlookMessage[]): string {
+	return messages.map((message, index) => {
+		const parts = [
+			`## ${message.from || `Message ${index + 1}`}${message.received ? ` - ${message.received}` : ''}`,
+		];
+		if (message.to) parts.push(`To: ${message.to}`);
+		if (message.cc) parts.push(`Cc: ${message.cc}`);
+		if (message.bodyText) parts.push('', message.bodyText);
+		return parts.join('\n');
+	}).join('\n\n---\n\n');
+}
+
 function buildContentHtml(data: Omit<OutlookExtraction, 'variables' | 'contentHtml'>): string {
 	const parts = ['<article class="outlook-email">'];
 	if (data.subject) parts.push(`<h1>${escapeHtml(data.subject)}</h1>`);
@@ -124,7 +208,11 @@ function buildContentHtml(data: Omit<OutlookExtraction, 'variables' | 'contentHt
 	if (data.cc) meta.push(`<p><strong>Cc:</strong> ${escapeHtml(data.cc)}</p>`);
 	if (data.received) meta.push(`<p><strong>Received:</strong> ${escapeHtml(data.received)}</p>`);
 	parts.push(...meta);
-	if (data.bodyHtml) parts.push(data.bodyHtml);
+	if (data.threadHtml) {
+		parts.push(data.threadHtml);
+	} else if (data.bodyHtml) {
+		parts.push(data.bodyHtml);
+	}
 	parts.push('</article>');
 	return parts.join('\n');
 }
@@ -139,8 +227,13 @@ export function extractOutlook(document: Document): OutlookExtraction | null {
 	if (!OUTLOOK_HOST_RE.test(url.hostname)) return null;
 
 	const root = findMessageRoot(document);
-	const body = findBodyElement(root);
-	if (!body) return null;
+	const messageElements = findMessageElements(root);
+	const messages = (messageElements.length > 0
+		? messageElements.map(extractMessage)
+		: [extractMessage(root)]
+	).filter((message): message is OutlookMessage => !!message);
+	if (messages.length === 0) return null;
+	const latestMessage = messages[messages.length - 1];
 
 	const subject = textFrom(root, [
 		'[data-testid="messageSubject"]',
@@ -150,7 +243,7 @@ export function extractOutlook(document: Document): OutlookExtraction | null {
 		'[role="heading"][aria-level="1"]',
 		'[role="heading"]',
 	]);
-	const from = textFrom(root, [
+	const from = latestMessage.from || textFrom(root, [
 		'[data-testid="messageHeaderSender"]',
 		'[data-testid="MessageHeaderSender"]',
 		'[aria-label^="From:"]',
@@ -158,18 +251,22 @@ export function extractOutlook(document: Document): OutlookExtraction | null {
 		'[aria-label*="Sender"]',
 	]) || fieldValue(root, 'From');
 	const fromEmail = extractEmail(
+		latestMessage.fromEmail
+		||
 		attrFrom(root, ['[data-testid="messageHeaderSender"]', '[aria-label^="From:"]', '[title^="From:"]'], 'aria-label')
 		|| attrFrom(root, ['[data-testid="messageHeaderSender"]', '[aria-label^="From:"]', '[title^="From:"]'], 'title')
 		|| from
 	);
-	const to = fieldValue(root, 'To');
-	const cc = fieldValue(root, 'Cc');
-	const received = attrFrom(root, ['time', '[data-testid="messageHeaderDate"]', '[title*=","]'], 'datetime')
+	const to = latestMessage.to || fieldValue(root, 'To');
+	const cc = latestMessage.cc || fieldValue(root, 'Cc');
+	const received = latestMessage.received || attrFrom(root, ['time', '[data-testid="messageHeaderDate"]', '[title*=","]'], 'datetime')
 		|| textFrom(root, ['time', '[data-testid="messageHeaderDate"]', '[aria-label^="Sent:"]'])
 		|| fieldValue(root, 'Sent')
 		|| fieldValue(root, 'Date');
-	const bodyHtml = sanitizeBodyHtml(body);
-	const bodyText = cleanText(body.textContent || '');
+	const bodyHtml = latestMessage.bodyHtml;
+	const bodyText = latestMessage.bodyText;
+	const threadHtml = messages.map(buildMessageHtml).join('\n');
+	const threadText = buildThreadText(messages);
 
 	if (!subject && !from && !bodyText) return null;
 
@@ -182,6 +279,9 @@ export function extractOutlook(document: Document): OutlookExtraction | null {
 		received,
 		bodyText,
 		bodyHtml,
+		threadText,
+		threadHtml,
+		messages,
 	};
 	const contentHtml = buildContentHtml(base);
 	const variables = {
@@ -193,6 +293,9 @@ export function extractOutlook(document: Document): OutlookExtraction | null {
 		outlookReceived: received,
 		outlookBody: bodyText,
 		outlookBodyHtml: bodyHtml,
+		outlookThread: threadText,
+		outlookThreadHtml: threadHtml,
+		outlookMessages: JSON.stringify(messages),
 	};
 
 	return {

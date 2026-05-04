@@ -75,4 +75,48 @@ describe('extractOutlook', () => {
 
 		expect(extractOutlook(document)?.subject).toBe('Cloud host subject');
 	});
+
+	test('extracts conversation history as ordered messages', () => {
+		const document = createDocument(`
+			<html>
+				<body>
+					<main role="main">
+						<h1>Thread subject</h1>
+						<div aria-label="Email message">
+							<span id="MSG_A_FROM" role="heading" aria-level="3" aria-label="From: First Sender">First Sender</span>
+							<div id="MSG_A_TO" role="heading" aria-level="3">Second Sender</div>
+							<div id="MSG_A_DATETIME" role="heading" aria-level="3">2026-01-01T01:00:00Z</div>
+							<div role="document" aria-label="Message body">
+								<p>Earlier message body.</p>
+							</div>
+						</div>
+						<div aria-label="Email message" id="focused">
+							<span id="MSG_B_FROM" role="heading" aria-level="3" aria-label="From: Second Sender">Second Sender</span>
+							<div id="MSG_B_TO" role="heading" aria-level="3">First Sender</div>
+							<div id="MSG_B_DATETIME" role="heading" aria-level="3">2026-01-02T02:00:00Z</div>
+							<div role="document" aria-label="Message body">
+								<p>Latest message body.</p>
+							</div>
+						</div>
+					</main>
+				</body>
+			</html>
+		`, 'https://outlook.cloud.microsoft/mail/inbox/id/thread-fixture');
+
+		const result = extractOutlook(document);
+
+		expect(result).not.toBeNull();
+		expect(result?.messages).toHaveLength(2);
+		expect(result?.from).toBe('Second Sender');
+		expect(result?.received).toBe('2026-01-02T02:00:00Z');
+		expect(result?.threadText).toContain('Earlier message body.');
+		expect(result?.threadText).toContain('Latest message body.');
+		const earlierIndex = result?.threadText.indexOf('Earlier message body.') ?? -1;
+		const latestIndex = result?.threadText.indexOf('Latest message body.') ?? -1;
+		expect(earlierIndex).toBeGreaterThanOrEqual(0);
+		expect(latestIndex).toBeGreaterThanOrEqual(0);
+		expect(earlierIndex).toBeLessThan(latestIndex);
+		expect(result?.variables.outlookThreadHtml).toContain('outlook-email-message');
+		expect(JSON.parse(result?.variables.outlookMessages || '[]')).toHaveLength(2);
+	});
 });

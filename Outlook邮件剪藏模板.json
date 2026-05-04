@@ -4,7 +4,7 @@
 	"behavior": "create",
 	"noteNameFormat": "{{outlookReceived|date:\"YYYY-MM-DD\"}} MAIL {{outlookSubject|safe_name}}",
 	"path": "mail",
-	"noteContentFormat": "\n#mail/unread\n\n> [!INFO]+ Message details\n> Received: {{outlookReceived|date:\"YYYY-MM-DDTHH:mm\"}}\n> From: {{outlookFrom}} <{{outlookFromEmail}}>\n> To: {{outlookTo}}\n> Subject: {{outlookSubject}}\n> Source: {{url}}\n\n# {{outlookSubject}}\n\n{{outlookBodyHtml|remove_tags:(\"table,td,tr,border\")|markdown}}\n\n---\n\n## Notes\n\n{{selection}}\n\n{{highlights}}",
+	"noteContentFormat": "\n#mail/unread\n\n> [!INFO]+ Message details\n> Received: {{outlookReceived|date:\"YYYY-MM-DDTHH:mm\"}}\n> From: {{outlookFrom}} <{{outlookFromEmail}}>\n> To: {{outlookTo}}\n> Subject: {{outlookSubject}}\n> Source: {{url}}\n\n# {{outlookSubject}}\n\n{{outlookThreadHtml|remove_tags:(\"table,td,tr,border\")|markdown}}\n\n---\n\n## Notes\n\n{{selection}}\n\n{{highlights}}",
 	"properties": [
 		{ "name": "created", "value": "{{time|date:\"YYYY-MM-DDTHH:mm:ssZ\"}}", "type": "datetime" },
 		{ "name": "reviewed", "value": "", "type": "datetime" },
