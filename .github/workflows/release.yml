@@ -59,6 +59,8 @@ jobs:
 
             This is an unofficial fork of [Obsidian Web Clipper](https://github.com/obsidianmd/obsidian-clipper) with personal workflow changes. Please compare this repository's code and commit history with upstream for the exact differences.
 
+            This fork includes extra site support and example templates, including Bilibili video transcripts, Xiaohongshu notes, and Outlook mail clipping.
+
             If you want the official, store-distributed extension, use [obsidian.md/clipper](https://obsidian.md/clipper) or the [Chrome Web Store listing](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf).
 
             ### Installation (sideloading)
@@ -73,6 +75,8 @@ jobs:
             ### 关于此版本
 
             这是 [Obsidian Web Clipper](https://github.com/obsidianmd/obsidian-clipper) 的非官方 fork，包含个人工作流改动。与上游官方版的准确差异，请对比本仓库代码和提交记录。
+
+            本 fork 包含额外站点支持和示例模板，包括哔哩哔哩视频字幕、小红书笔记和 Outlook 邮件剪藏。
 
             如果你想使用官方商店分发的扩展，请使用 [obsidian.md/clipper](https://obsidian.md/clipper) 或 [Chrome Web Store 页面](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)。
 

@@ -1,7 +1,7 @@
 > **【中文说明】**  
 > 本仓库是 [Obsidian 官方网页剪藏（obsidian-clipper）](https://github.com/obsidianmd/obsidian-clipper) 的个人 fork，用于保留一些适合个人工作流的改动。与官方版的具体差异请以本仓库代码和提交记录为准。  
 > 如果你只需要官方稳定版，请优先使用 [官方安装页](https://obsidian.md/clipper)、[Chrome Web Store](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf) 或 [官方 GitHub 仓库](https://github.com/obsidianmd/obsidian-clipper)。  
-> 本 fork 包含额外站点支持和示例模板，例如 [哔哩哔哩视频字幕剪藏模板.json](./哔哩哔哩视频字幕剪藏模板.json) 与 [小红书笔记剪藏模板.json](./小红书笔记剪藏模板.json)。导入模板时，可在 GitHub 打开对应文件后点击 **Raw** 下载再导入。
+> 本 fork 包含额外站点支持和示例模板，例如 [哔哩哔哩视频字幕剪藏模板.json](./哔哩哔哩视频字幕剪藏模板.json)、[小红书笔记剪藏模板.json](./小红书笔记剪藏模板.json) 与 [Outlook邮件剪藏模板.json](./Outlook邮件剪藏模板.json)。导入模板时，可在 GitHub 打开对应文件后点击 **Raw** 下载再导入。
 
 ## 下载与安装
 

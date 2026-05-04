@@ -17,6 +17,7 @@ import {
 	type FetchBilibiliTranscriptResponse,
 } from './utils/bilibili-transcript';
 import { extractXiaohongshu } from './utils/xiaohongshu';
+import { extractOutlook } from './utils/outlook';
 
 declare global {
 	interface Window {
@@ -260,6 +261,16 @@ declare global {
 					image = xhs.image || image;
 					published = xhs.published || published;
 					site = site || '小红书';
+				}
+				const outlook = extractOutlook(document);
+				if (outlook) {
+					Object.assign(extractedContent, outlook.variables);
+					articleContent = outlook.contentHtml;
+					title = outlook.subject || title;
+					author = outlook.from || author;
+					description = outlook.bodyText || description;
+					published = outlook.received || published;
+					site = site || 'Outlook';
 				}
 
 				// Create a new DOMParser

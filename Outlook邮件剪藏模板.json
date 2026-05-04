@@ -1,0 +1,27 @@
+{
+	"schemaVersion": "0.1.0",
+	"name": "Outlook Mail",
+	"behavior": "create",
+	"noteNameFormat": "{{outlookReceived|date:\"YYYY-MM-DD\"}} MAIL {{outlookSubject|safe_name}}",
+	"path": "mail",
+	"noteContentFormat": "\n#mail/unread\n\n> [!INFO]+ Message details\n> Received: {{outlookReceived|date:\"YYYY-MM-DDTHH:mm\"}}\n> From: {{outlookFrom}} <{{outlookFromEmail}}>\n> To: {{outlookTo}}\n> Subject: {{outlookSubject}}\n> Source: {{url}}\n\n# {{outlookSubject}}\n\n{{outlookBodyHtml|remove_tags:(\"table,td,tr,border\")|markdown}}\n\n---\n\n## Notes\n\n{{selection}}\n\n{{highlights}}",
+	"properties": [
+		{ "name": "created", "value": "{{time|date:\"YYYY-MM-DDTHH:mm:ssZ\"}}", "type": "datetime" },
+		{ "name": "reviewed", "value": "", "type": "datetime" },
+		{ "name": "url", "value": "{{url}}", "type": "text" },
+		{ "name": "received", "value": "{{outlookReceived|date:\"YYYY-MM-DDTHH:mm\"}}", "type": "datetime" },
+		{ "name": "subject", "value": "{{outlookSubject}}", "type": "text" },
+		{ "name": "author", "value": "{{outlookFrom|wikilink}}", "type": "multitext" },
+		{ "name": "senderEmail", "value": "{{outlookFromEmail}}", "type": "text" },
+		{ "name": "tags", "value": "email, outlook, clippings", "type": "multitext" }
+	],
+	"triggers": [
+		"https://outlook.cloud.microsoft/mail",
+		"https://outlook.live.com/mail",
+		"https://outlook.office.com/mail",
+		"https://outlook.office365.com/mail",
+		"https://www.office.com/mail",
+		"https://www.office365.com/mail",
+		"/https?:\\/\\/(outlook\\.cloud\\.microsoft|[^/?]*(outlook|office|office365|mail\\.office365)\\.com)\\/(mail|owa)/"
+	]
+}
